@@ -1,0 +1,46 @@
+package uc.security_ms.mapper;
+
+import uc.security_ms.dto.CreateUserDTO;
+import uc.security_ms.dto.UpdateUserDTO;
+import uc.security_ms.dto.UserResponseDTO;
+import uc.security_ms.entity.User;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
+
+@Component
+public class UserMapper {
+
+    public User toEntity(CreateUserDTO dto) {
+        User user = new User();
+
+        user.setName(dto.getName());
+        user.setEmail(dto.getEmail());
+        user.setPassword(dto.getPassword());
+
+        return user;
+    }
+
+    public void updateEntity(UpdateUserDTO dto, User user) {
+        user.setName(dto.getName());
+        user.setEmail(dto.getEmail());
+
+        if (dto.getPassword() != null) {
+            user.setPassword(dto.getPassword());
+        }
+    }
+
+    public UserResponseDTO toResponseDTO(User user) {
+        return new UserResponseDTO(
+                user.getId(),
+                user.getName(),
+                user.getEmail()
+        );
+    }
+
+    public List<UserResponseDTO> toResponseDTOList(List<User> users) {
+        return users.stream()
+                .map(this::toResponseDTO)
+                .toList();
+    }
+}
