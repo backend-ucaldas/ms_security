@@ -2,22 +2,25 @@ package com.uc.ms_security.mapper;
 
 import com.uc.ms_security.dto.CreateUserDTO;
 import com.uc.ms_security.dto.UpdateUserDTO;
+import com.uc.ms_security.dto.UserDetailResponseDTO;
 import com.uc.ms_security.dto.UserResponseDTO;
 import com.uc.ms_security.entity.User;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @Component
+@RequiredArgsConstructor
 public class UserMapper {
+
+    private final ProfileMapper profileMapper;
 
     public User toEntity(CreateUserDTO dto) {
         User user = new User();
-
         user.setName(dto.getName());
         user.setEmail(dto.getEmail());
         user.setPassword(dto.getPassword());
-
         return user;
     }
 
@@ -35,6 +38,15 @@ public class UserMapper {
                 user.getId(),
                 user.getName(),
                 user.getEmail()
+        );
+    }
+
+    public UserDetailResponseDTO toDetailResponseDTO(User user) {
+        return new UserDetailResponseDTO(
+                user.getId(),
+                user.getName(),
+                user.getEmail(),
+                profileMapper.toResponseDTO(user.getProfile())
         );
     }
 

@@ -1,16 +1,19 @@
 package com.uc.ms_security.entity;
 
 import jakarta.persistence.*;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
+
 @Entity
-@Table(name = "users")
+@Table(name = "profiles")
 @Getter
 @Setter
 @NoArgsConstructor
-public class User {
+public class Profile {
 
     @Id
     @GeneratedValue(
@@ -20,27 +23,23 @@ public class User {
 
     @Column(
             nullable = false,
-            length = 100
+            length = 30
     )
-    private String name;
+    private String phone;
 
     @Column(
-            nullable = false,
-            unique = true,
-            length = 150
-    )
-    private String email;
-
-    @Column(
+            name = "birth_date",
             nullable = false
     )
-    private String password;
+    private LocalDate birthDate;
 
     @OneToOne(
-            mappedBy = "user",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true,
             fetch = FetchType.LAZY
     )
-    private Profile profile;
+    @JoinColumn(
+            name = "user_id",
+            nullable = false,
+            unique = true
+    )
+    private User user;
 }

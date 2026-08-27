@@ -183,7 +183,7 @@ entity/Profile.java
 ```
 
 ```java
-package com.example.users.entity;
+package com.uc.ms_security.entity;
 
 import jakarta.persistence.*;
 
@@ -202,29 +202,29 @@ public class Profile {
 
     @Id
     @GeneratedValue(
-        strategy = GenerationType.IDENTITY
+            strategy = GenerationType.IDENTITY
     )
     private Long id;
 
     @Column(
-        nullable = false,
-        length = 30
+            nullable = false,
+            length = 30
     )
     private String phone;
 
     @Column(
-        name = "birth_date",
-        nullable = false
+            name = "birth_date",
+            nullable = false
     )
     private LocalDate birthDate;
 
     @OneToOne(
-        fetch = FetchType.LAZY
+            fetch = FetchType.LAZY
     )
     @JoinColumn(
-        name = "user_id",
-        nullable = false,
-        unique = true
+            name = "user_id",
+            nullable = false,
+            unique = true
     )
     private User user;
 }
@@ -312,10 +312,9 @@ private Profile profile;
 La entidad completa quedaría:
 
 ```java
-package com.example.users.entity;
+package com.uc.ms_security.entity;
 
 import jakarta.persistence.*;
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -329,33 +328,33 @@ public class User {
 
     @Id
     @GeneratedValue(
-        strategy = GenerationType.IDENTITY
+            strategy = GenerationType.IDENTITY
     )
     private Long id;
 
     @Column(
-        nullable = false,
-        length = 100
+            nullable = false,
+            length = 100
     )
     private String name;
 
     @Column(
-        nullable = false,
-        unique = true,
-        length = 150
+            nullable = false,
+            unique = true,
+            length = 150
     )
     private String email;
 
     @Column(
-        nullable = false
+            nullable = false
     )
     private String password;
 
     @OneToOne(
-        mappedBy = "user",
-        cascade = CascadeType.ALL,
-        orphanRemoval = true,
-        fetch = FetchType.LAZY
+            mappedBy = "user",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.LAZY
     )
     private Profile profile;
 }
@@ -438,7 +437,7 @@ dto/ProfileRequestDTO.java
 ```
 
 ```java
-package com.example.users.dto;
+package com.uc.ms_security.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -454,18 +453,19 @@ import java.time.LocalDate;
 public class ProfileRequestDTO {
 
     @NotBlank(
-        message = "El teléfono es obligatorio"
+            message = "El teléfono es obligatorio"
     )
     private String phone;
 
     @NotNull(
-        message = "La fecha de nacimiento es obligatoria"
+            message = "La fecha de nacimiento es obligatoria"
     )
     @Past(
-        message = "La fecha de nacimiento debe estar en el pasado"
+            message = "La fecha de nacimiento debe estar en el pasado"
     )
     private LocalDate birthDate;
 }
+
 ```
 
 Aquí introducimos:
@@ -498,7 +498,7 @@ dto/ProfileResponseDTO.java
 ```
 
 ```java
-package com.example.users.dto;
+package com.uc.ms_security.dto;
 
 import lombok.Value;
 
@@ -569,7 +569,7 @@ UserDetailResponseDTO
 para consultar un usuario individual.
 
 ```java
-package com.example.users.dto;
+package com.uc.ms_security.dto;
 
 import lombok.Value;
 
@@ -646,12 +646,11 @@ mapper/ProfileMapper.java
 ```
 
 ```java
-package com.example.users.mapper;
+package com.uc.ms_security.mapper;
 
-import com.example.users.dto.ProfileRequestDTO;
-import com.example.users.dto.ProfileResponseDTO;
-import com.example.users.entity.Profile;
-
+import com.uc.ms_security.dto.ProfileRequestDTO;
+import com.uc.ms_security.dto.ProfileResponseDTO;
+import com.uc.ms_security.entity.Profile;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -661,14 +660,14 @@ public class ProfileMapper {
             ProfileRequestDTO dto) {
 
         Profile profile =
-            new Profile();
+                new Profile();
 
         profile.setPhone(
-            dto.getPhone()
+                dto.getPhone()
         );
 
         profile.setBirthDate(
-            dto.getBirthDate()
+                dto.getBirthDate()
         );
 
         return profile;
@@ -679,11 +678,11 @@ public class ProfileMapper {
             Profile profile) {
 
         profile.setPhone(
-            dto.getPhone()
+                dto.getPhone()
         );
 
         profile.setBirthDate(
-            dto.getBirthDate()
+                dto.getBirthDate()
         );
     }
 
@@ -695,9 +694,9 @@ public class ProfileMapper {
         }
 
         return new ProfileResponseDTO(
-            profile.getId(),
-            profile.getPhone(),
-            profile.getBirthDate()
+                profile.getId(),
+                profile.getPhone(),
+                profile.getBirthDate()
         );
     }
 }
@@ -747,13 +746,14 @@ public class UserMapper {
 Una versión completa quedaría:
 
 ```java
-package com.example.users.mapper;
+package com.uc.ms_security.mapper;
 
-import com.example.users.dto.*;
-import com.example.users.entity.User;
-
+import com.uc.ms_security.dto.CreateUserDTO;
+import com.uc.ms_security.dto.UpdateUserDTO;
+import com.uc.ms_security.dto.UserDetailResponseDTO;
+import com.uc.ms_security.dto.UserResponseDTO;
+import com.uc.ms_security.entity.User;
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -764,77 +764,44 @@ public class UserMapper {
 
     private final ProfileMapper profileMapper;
 
-    public User toEntity(
-            CreateUserDTO dto) {
-
-        User user =
-            new User();
-
-        user.setName(
-            dto.getName()
-        );
-
-        user.setEmail(
-            dto.getEmail()
-        );
-
-        user.setPassword(
-            dto.getPassword()
-        );
-
+    public User toEntity(CreateUserDTO dto) {
+        User user = new User();
+        user.setName(dto.getName());
+        user.setEmail(dto.getEmail());
+        user.setPassword(dto.getPassword());
         return user;
     }
 
-    public void updateEntity(
-            UpdateUserDTO dto,
-            User user) {
-
-        user.setName(
-            dto.getName()
-        );
-
-        user.setEmail(
-            dto.getEmail()
-        );
+    public void updateEntity(UpdateUserDTO dto, User user) {
+        user.setName(dto.getName());
+        user.setEmail(dto.getEmail());
 
         if (dto.getPassword() != null) {
-
-            user.setPassword(
-                dto.getPassword()
-            );
+            user.setPassword(dto.getPassword());
         }
     }
 
-    public UserResponseDTO toResponseDTO(
-            User user) {
-
+    public UserResponseDTO toResponseDTO(User user) {
         return new UserResponseDTO(
-            user.getId(),
-            user.getName(),
-            user.getEmail()
+                user.getId(),
+                user.getName(),
+                user.getEmail()
         );
     }
 
-    public UserDetailResponseDTO toDetailResponseDTO(
-            User user) {
-
+    public UserDetailResponseDTO toDetailResponseDTO(User user) {
         return new UserDetailResponseDTO(
-            user.getId(),
-            user.getName(),
-            user.getEmail(),
-            profileMapper.toResponseDTO(
-                user.getProfile()
-            )
+                user.getId(),
+                user.getName(),
+                user.getEmail(),
+                profileMapper.toResponseDTO(user.getProfile())
         );
     }
 
-    public List<UserResponseDTO> toResponseDTOList(
-            List<User> users) {
-
-        return users
-            .stream()
-            .map(this::toResponseDTO)
-            .toList();
+    public List<UserResponseDTO> toResponseDTOList(List<User> users) {
+        return users.stream()
+                .map(this::toResponseDTO)
+                .toList();
     }
 }
 ```
@@ -850,24 +817,18 @@ repository/ProfileRepository.java
 ```
 
 ```java
-package com.example.users.repository;
+package com.uc.ms_security.repository;
 
-import com.example.users.entity.Profile;
-
+import com.uc.ms_security.entity.Profile;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-public interface ProfileRepository
-        extends JpaRepository<Profile, Long> {
+public interface ProfileRepository extends JpaRepository<Profile, Long> {
 
-    Optional<Profile> findByUserId(
-        Long userId
-    );
+    Optional<Profile> findByUserId(Long userId);
 
-    boolean existsByUserId(
-        Long userId
-    );
+    boolean existsByUserId(Long userId);
 }
 ```
 
@@ -942,34 +903,26 @@ Utilizaremos:
 Actualizamos:
 
 ```java
-package com.example.users.repository;
+package com.uc.ms_security.repository;
 
-import com.example.users.entity.User;
-
+import com.uc.ms_security.entity.User;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-public interface UserRepository
-        extends JpaRepository<User, Long> {
+public interface UserRepository extends JpaRepository<User, Long> {
 
-    boolean existsByEmail(
-        String email
-    );
+    boolean existsByEmail(String email);
 
-    boolean existsByEmailAndIdNot(
-        String email,
-        Long id
-    );
+    boolean existsByEmailAndIdNot(String email, Long id);
 
-    @EntityGraph(
-        attributePaths = {"profile"}
-    )
+    @EntityGraph(attributePaths = {"profile"})
     Optional<User> findWithProfileById(
-        Long id
+            Long id
     );
 }
+
 ```
 
 Ahora tenemos dos maneras de buscar:
@@ -1059,24 +1012,20 @@ public UserResponseDTO findById(
 }
 ```
 
-Ahora cambiaremos el tipo de retorno:
+Ahora agregaremos el tipo de retorno:
 
 ```java
-public UserDetailResponseDTO findById(
-        Long id) {
+public UserDetailResponseDTO findByIdAndProfile(Long id) {
+        User user =userRepository
+                        .findWithProfileById(id)
+                        .orElseThrow(
+                                () -> new ResponseStatusException(
+                                        HttpStatus.NOT_FOUND,
+                                        "Usuario no encontrado"
+                                )
+                        );
 
-    User user =
-        userRepository
-            .findWithProfileById(id)
-            .orElseThrow(
-                () -> new ResponseStatusException(
-                    HttpStatus.NOT_FOUND,
-                    "Usuario no encontrado"
-                )
-            );
-
-    return userMapper
-        .toDetailResponseDTO(user);
+        return userMapper.toDetailResponseDTO(user);
 }
 ```
 
@@ -1102,21 +1051,21 @@ Nuestro endpoint:
 @GetMapping("/{id}")
 ```
 
-cambiará a:
+ahora agregaremos :
 
 ```java
-@GetMapping("/{id}")
-public UserDetailResponseDTO findById(
-        @PathVariable Long id) {
+@GetMapping("/{id}/profile")
+    public UserDetailResponseDTO findByIdAndProfile(
+            @PathVariable Long id) {
 
-    return userService.findById(id);
+        return userService.findByIdAndProfile(id);
 }
 ```
 
 Así:
 
 ```http
-GET /api/users/1
+GET /api/users/1/profile
 ```
 
 devuelve:
@@ -1170,18 +1119,16 @@ service/ProfileService.java
 ```
 
 ```java
-package com.example.users.service;
+package com.uc.ms_security.service;
 
-import com.example.users.dto.ProfileRequestDTO;
-import com.example.users.dto.ProfileResponseDTO;
-import com.example.users.entity.Profile;
-import com.example.users.entity.User;
-import com.example.users.mapper.ProfileMapper;
-import com.example.users.repository.ProfileRepository;
-import com.example.users.repository.UserRepository;
-
+import com.uc.ms_security.dto.ProfileRequestDTO;
+import com.uc.ms_security.dto.ProfileResponseDTO;
+import com.uc.ms_security.entity.Profile;
+import com.uc.ms_security.entity.User;
+import com.uc.ms_security.mapper.ProfileMapper;
+import com.uc.ms_security.repository.ProfileRepository;
+import com.uc.ms_security.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -1191,308 +1138,60 @@ import org.springframework.web.server.ResponseStatusException;
 public class ProfileService {
 
     private final ProfileRepository profileRepository;
-
     private final UserRepository userRepository;
-
-    private final ProfileMapper profileMapper;
-}
-```
-
----
-
-# 23. Crear un perfil para un usuario
-
-Agregamos:
-
-```java
-public ProfileResponseDTO create(
-        Long userId,
-        ProfileRequestDTO dto) {
-
-    User user =
-        userRepository
-            .findById(userId)
-            .orElseThrow(
-                () -> new ResponseStatusException(
-                    HttpStatus.NOT_FOUND,
-                    "Usuario no encontrado"
-                )
-            );
-
-    if (
-        profileRepository.existsByUserId(
-            userId
-        )
-    ) {
-
-        throw new ResponseStatusException(
-            HttpStatus.CONFLICT,
-            "El usuario ya tiene un perfil"
-        );
-    }
-
-    Profile profile =
-        profileMapper.toEntity(dto);
-
-    profile.setUser(user);
-
-    Profile savedProfile =
-        profileRepository.save(profile);
-
-    return profileMapper
-        .toResponseDTO(savedProfile);
-}
-```
-
-La parte fundamental de la relación es:
-
-```java
-profile.setUser(user);
-```
-
-Esto establece:
-
-```text
-Profile
-  │
-  └── user_id
-```
-
----
-
-# 24. Flujo de creación de Profile
-
-```text
-POST /api/users/1/profile
-
-        ↓
-
-ProfileRequestDTO
-        ↓
-ProfileService
-        ↓
-Buscar User 1
-        ↓
-¿Existe?
-        ↓
-¿Ya tiene perfil?
-        ↓
-ProfileMapper
-        ↓
-Profile
-        ↓
-profile.setUser(user)
-        ↓
-ProfileRepository
-        ↓
-MySQL
-```
-
----
-
-# 25. Actualizar Profile
-
-Agregamos:
-
-```java
-public ProfileResponseDTO update(
-        Long userId,
-        ProfileRequestDTO dto) {
-
-    Profile profile =
-        profileRepository
-            .findByUserId(userId)
-            .orElseThrow(
-                () -> new ResponseStatusException(
-                    HttpStatus.NOT_FOUND,
-                    "Perfil no encontrado"
-                )
-            );
-
-    profileMapper.updateEntity(
-        dto,
-        profile
-    );
-
-    Profile updatedProfile =
-        profileRepository.save(profile);
-
-    return profileMapper
-        .toResponseDTO(updatedProfile);
-}
-```
-
----
-
-# 26. Consultar Profile
-
-También podemos agregar:
-
-```java
-public ProfileResponseDTO findByUserId(
-        Long userId) {
-
-    Profile profile =
-        profileRepository
-            .findByUserId(userId)
-            .orElseThrow(
-                () -> new ResponseStatusException(
-                    HttpStatus.NOT_FOUND,
-                    "Perfil no encontrado"
-                )
-            );
-
-    return profileMapper
-        .toResponseDTO(profile);
-}
-```
-
----
-
-# 27. Eliminar Profile
-
-```java
-public void delete(
-        Long userId) {
-
-    Profile profile =
-        profileRepository
-            .findByUserId(userId)
-            .orElseThrow(
-                () -> new ResponseStatusException(
-                    HttpStatus.NOT_FOUND,
-                    "Perfil no encontrado"
-                )
-            );
-
-    profileRepository.delete(profile);
-}
-```
-
----
-
-# 28. `ProfileService` completo
-
-```java
-package com.example.users.service;
-
-import com.example.users.dto.ProfileRequestDTO;
-import com.example.users.dto.ProfileResponseDTO;
-import com.example.users.entity.Profile;
-import com.example.users.entity.User;
-import com.example.users.mapper.ProfileMapper;
-import com.example.users.repository.ProfileRepository;
-import com.example.users.repository.UserRepository;
-
-import lombok.RequiredArgsConstructor;
-
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
-
-@Service
-@RequiredArgsConstructor
-public class ProfileService {
-
-    private final ProfileRepository profileRepository;
-
-    private final UserRepository userRepository;
-
     private final ProfileMapper profileMapper;
 
-    public ProfileResponseDTO create(
-            Long userId,
-            ProfileRequestDTO dto) {
-
-        User user =
-            userRepository
-                .findById(userId)
-                .orElseThrow(
-                    () -> new ResponseStatusException(
+    public ProfileResponseDTO create(Long userId, ProfileRequestDTO dto) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND,
                         "Usuario no encontrado"
-                    )
-                );
+                ));
 
-        if (
-            profileRepository
-                .existsByUserId(userId)
-        ) {
-
+        if (profileRepository.existsByUserId(userId)) {
             throw new ResponseStatusException(
-                HttpStatus.CONFLICT,
-                "El usuario ya tiene un perfil"
+                    HttpStatus.CONFLICT,
+                    "El usuario ya tiene un perfil"
             );
         }
 
-        Profile profile =
-            profileMapper.toEntity(dto);
-
+        Profile profile = profileMapper.toEntity(dto);
         profile.setUser(user);
 
-        Profile savedProfile =
-            profileRepository.save(profile);
-
-        return profileMapper
-            .toResponseDTO(savedProfile);
+        Profile savedProfile = profileRepository.save(profile);
+        return profileMapper.toResponseDTO(savedProfile);
     }
 
-    public ProfileResponseDTO findByUserId(
-            Long userId) {
+    public ProfileResponseDTO update(Long userId, ProfileRequestDTO dto) {
+        Profile profile = findProfile(userId);
 
-        Profile profile =
-            findProfile(userId);
+        profileMapper.updateEntity(dto, profile);
+        Profile updatedProfile = profileRepository.save(profile);
 
-        return profileMapper
-            .toResponseDTO(profile);
+        return profileMapper.toResponseDTO(updatedProfile);
     }
 
-    public ProfileResponseDTO update(
-            Long userId,
-            ProfileRequestDTO dto) {
-
-        Profile profile =
-            findProfile(userId);
-
-        profileMapper.updateEntity(
-            dto,
-            profile
-        );
-
-        Profile updatedProfile =
-            profileRepository.save(profile);
-
-        return profileMapper
-            .toResponseDTO(updatedProfile);
+    public ProfileResponseDTO findByUserId(Long userId) {
+        return profileMapper.toResponseDTO(findProfile(userId));
     }
 
-    public void delete(
-            Long userId) {
-
-        Profile profile =
-            findProfile(userId);
-
-        profileRepository.delete(profile);
+    public void delete(Long userId) {
+        profileRepository.delete(findProfile(userId));
     }
 
-    private Profile findProfile(
-            Long userId) {
-
-        return profileRepository
-            .findByUserId(userId)
-            .orElseThrow(
-                () -> new ResponseStatusException(
-                    HttpStatus.NOT_FOUND,
-                    "Perfil no encontrado"
-                )
-            );
+    private Profile findProfile(Long userId) {
+        return profileRepository.findByUserId(userId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Perfil no encontrado"
+                ));
     }
 }
 ```
 
 ---
 
-# 29. Crear `ProfileController`
+# 23. Crear `ProfileController`
 
 Creamos:
 
@@ -1509,23 +1208,18 @@ Como el Profile pertenece al User, utilizaremos rutas anidadas:
 Controller:
 
 ```java
-package com.example.users.controller;
+package com.uc.ms_security.controller;
 
-import com.example.users.dto.ProfileRequestDTO;
-import com.example.users.dto.ProfileResponseDTO;
-import com.example.users.service.ProfileService;
-
+import com.uc.ms_security.dto.ProfileRequestDTO;
+import com.uc.ms_security.dto.ProfileResponseDTO;
+import com.uc.ms_security.service.ProfileService;
 import jakarta.validation.Valid;
-
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping(
-    "/api/users/{userId}/profile"
-)
+@RequestMapping("/api/users/{userId}/profile")
 @RequiredArgsConstructor
 public class ProfileController {
 
@@ -1535,43 +1229,25 @@ public class ProfileController {
     @ResponseStatus(HttpStatus.CREATED)
     public ProfileResponseDTO create(
             @PathVariable Long userId,
-            @Valid
-            @RequestBody ProfileRequestDTO dto) {
-
-        return profileService.create(
-            userId,
-            dto
-        );
+            @Valid @RequestBody ProfileRequestDTO dto) {
+        return profileService.create(userId, dto);
     }
-
-    @GetMapping
-    public ProfileResponseDTO find(
-            @PathVariable Long userId) {
-
-        return profileService
-            .findByUserId(userId);
-    }
+       
 
     @PutMapping
     public ProfileResponseDTO update(
             @PathVariable Long userId,
-            @Valid
-            @RequestBody ProfileRequestDTO dto) {
-
-        return profileService.update(
-            userId,
-            dto
-        );
+            @Valid @RequestBody ProfileRequestDTO dto) {
+        return profileService.update(userId, dto);
     }
 
     @DeleteMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(
-            @PathVariable Long userId) {
-
+    public void delete(@PathVariable Long userId) {
         profileService.delete(userId);
     }
 }
+
 ```
 
 ---
