@@ -1,6 +1,6 @@
-package uc.security_ms.repository;
+package com.uc.ms_security.repository;
 
-import uc.security_ms.entity.User;
+import com.uc.ms_security.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface UserRepository extends JpaRepository<User, Long> {

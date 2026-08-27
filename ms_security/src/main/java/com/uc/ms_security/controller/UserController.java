@@ -1,9 +1,9 @@
-package uc.security_ms.controller;
+package com.uc.ms_security.controller;
 
-import uc.security_ms.dto.CreateUserDTO;
-import uc.security_ms.dto.UpdateUserDTO;
-import uc.security_ms.dto.UserResponseDTO;
-import uc.security_ms.service.UserService;
+import com.uc.ms_security.dto.CreateUserDTO;
+import com.uc.ms_security.dto.UpdateUserDTO;
+import com.uc.ms_security.dto.UserResponseDTO;
+import com.uc.ms_security.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

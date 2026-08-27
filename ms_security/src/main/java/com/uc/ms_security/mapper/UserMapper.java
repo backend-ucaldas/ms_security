@@ -1,9 +1,9 @@
-package uc.security_ms.mapper;
+package com.uc.ms_security.mapper;
 
-import uc.security_ms.dto.CreateUserDTO;
-import uc.security_ms.dto.UpdateUserDTO;
-import uc.security_ms.dto.UserResponseDTO;
-import uc.security_ms.entity.User;
+import com.uc.ms_security.dto.CreateUserDTO;
+import com.uc.ms_security.dto.UpdateUserDTO;
+import com.uc.ms_security.dto.UserResponseDTO;
+import com.uc.ms_security.entity.User;
 import org.springframework.stereotype.Component;
 
 import java.util.List;

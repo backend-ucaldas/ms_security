@@ -217,7 +217,7 @@ entity/User.java
 ```
 
 ```java
-package uc.security_ms.entity;
+package com.uc.ms_security.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -333,7 +333,7 @@ dto/BaseUserDTO.java
 ```
 
 ```java
-package uc.security_ms.dto;
+package com.uc.ms_security.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -388,7 +388,7 @@ dto/CreateUserDTO.java
 ```
 
 ```java
-package uc.security_ms.dto;
+package com.uc.ms_security.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -410,7 +410,6 @@ public class CreateUserDTO
     )
     private String password;
 }
-
 ```
 
 Entonces:
@@ -437,8 +436,7 @@ dto/UpdateUserDTO.java
 ```
 
 ```java
-package uc.security_ms.dto;
-
+package com.uc.ms_security.dto;
 
 import jakarta.validation.constraints.Size;
 
@@ -482,7 +480,8 @@ El DTO de respuesta nunca debe devolver la contraseña.
 Podemos aprovechar Lombok con `@Value`:
 
 ```java
-package uc.security_ms.dto;
+package com.uc.ms_security.dto;
+
 import lombok.Value;
 
 @Value
@@ -530,12 +529,12 @@ mapper/UserMapper.java
 ```
 
 ```java
-package uc.security_ms.mapper;
+package com.uc.ms_security.mapper;
 
-import uc.security_ms.dto.CreateUserDTO;
-import uc.security_ms.dto.UpdateUserDTO;
-import uc.security_ms.dto.UserResponseDTO;
-import uc.security_ms.entity.User;
+import com.uc.ms_security.dto.CreateUserDTO;
+import com.uc.ms_security.dto.UpdateUserDTO;
+import com.uc.ms_security.dto.UserResponseDTO;
+import com.uc.ms_security.entity.User;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -652,9 +651,9 @@ repository/UserRepository.java
 ```
 
 ```java
-package uc.security_ms.repository;
+package com.uc.ms_security.repository;
 
-import uc.security_ms.entity.User;
+import com.uc.ms_security.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface UserRepository extends JpaRepository<User, Long> {
@@ -663,6 +662,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     boolean existsByEmailAndIdNot(String email, Long id);
 }
+
 ```
 
 Al extender:
@@ -690,15 +690,14 @@ service/UserService.java
 ```
 
 ```java
-package uc.security_ms.users.service;
+package com.uc.ms_security.service;
 
-import uc.security_ms.users.dto.CreateUserDTO;
-import uc.security_ms.users.dto.UpdateUserDTO;
-import uc.security_ms.users.dto.UserResponseDTO;
-import uc.security_ms.users.entity.User;
-import uc.security_ms.users.mapper.UserMapper;
-import uc.security_ms.users.repository.UserRepository;
-
+import com.uc.ms_security.dto.CreateUserDTO;
+import com.uc.ms_security.dto.UpdateUserDTO;
+import com.uc.ms_security.dto.UserResponseDTO;
+import com.uc.ms_security.entity.User;
+import com.uc.ms_security.mapper.UserMapper;
+import com.uc.ms_security.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.HttpStatus;
@@ -714,6 +713,51 @@ public class UserService {
     private final UserRepository userRepository;
 
     private final UserMapper userMapper;
+
+    public UserResponseDTO create(CreateUserDTO dto) {
+        if (userRepository.existsByEmail(dto.getEmail())) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Ya existe un usuario con este email"
+            );
+        }
+        User user = userMapper.toEntity(dto);
+        User savedUser = userRepository.save(user);
+        return userMapper.toResponseDTO(savedUser);
+    }
+    public List<UserResponseDTO> findAll() {
+        List<User> users =userRepository.findAll();
+        return userMapper.toResponseDTOList(users);
+    }
+    private User findUser(Long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Usuario no encontrado"
+                ));
+    }
+
+    public UserResponseDTO findById(Long id) {
+        User user = findUser(id);
+        return userMapper.toResponseDTO(user);
+    }
+
+    public UserResponseDTO update(Long id, UpdateUserDTO dto) {
+        User user = findUser(id);
+        if (userRepository.existsByEmailAndIdNot(dto.getEmail(), id)) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "El email pertenece a otro usuario"
+            );
+        }
+        userMapper.updateEntity(dto, user);
+        User updatedUser = userRepository.save(user);
+        return userMapper.toResponseDTO(updatedUser);
+    }
+    public void delete(Long id) {
+        User user = findUser(id);
+        userRepository.delete(user);
+    }
 }
 ```
 
@@ -758,7 +802,7 @@ public UserResponseDTO create(CreateUserDTO dto) {
         User user = userMapper.toEntity(dto);
         User savedUser = userRepository.save(user);
         return userMapper.toResponseDTO(savedUser);
-    }
+}
 ```
 
 Ahora el Service está mucho más limpio.
@@ -863,94 +907,17 @@ public void delete(Long id) {
 
 ---
 
-# 23. Service completo
-
-```java
-package uc.security_ms.service;
-
-
-import uc.security_ms.dto.CreateUserDTO;
-import uc.security_ms.dto.UpdateUserDTO;
-import uc.security_ms.dto.UserResponseDTO;
-import uc.security_ms.entity.User;
-import uc.security_ms.mapper.UserMapper;
-import uc.security_ms.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
-
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
-
-import java.util.List;
-
-@Service
-@RequiredArgsConstructor
-public class UserService {
-
-    private final UserRepository userRepository;
-
-    private final UserMapper userMapper;
-
-    public UserResponseDTO create(CreateUserDTO dto) {
-        if (userRepository.existsByEmail(dto.getEmail())) {
-            throw new ResponseStatusException(
-                    HttpStatus.CONFLICT,
-                    "Ya existe un usuario con este email"
-            );
-        }
-        User user = userMapper.toEntity(dto);
-        User savedUser = userRepository.save(user);
-        return userMapper.toResponseDTO(savedUser);
-    }
-    public List<UserResponseDTO> findAll() {
-        List<User> users =userRepository.findAll();
-        return userMapper.toResponseDTOList(users);
-    }
-    private User findUser(Long id) {
-        return userRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Usuario no encontrado"
-                ));
-    }
-
-    public UserResponseDTO findById(Long id) {
-        User user = findUser(id);
-        return userMapper.toResponseDTO(user);
-    }
-
-    public UserResponseDTO update(Long id, UpdateUserDTO dto) {
-        User user = findUser(id);
-        if (userRepository.existsByEmailAndIdNot(dto.getEmail(), id)) {
-            throw new ResponseStatusException(
-                    HttpStatus.CONFLICT,
-                    "El email pertenece a otro usuario"
-            );
-        }
-        userMapper.updateEntity(dto, user);
-        User updatedUser = userRepository.save(user);
-        return userMapper.toResponseDTO(updatedUser);
-    }
-    public void delete(Long id) {
-        User user = findUser(id);
-        userRepository.delete(user);
-    }
-}
-```
-
----
-
-# 24. Controller
+# 23. Controller
 
 También podemos aprovechar Lombok para la inyección de dependencias.
 
 ```java
-package uc.security_ms.controller;
+package com.uc.ms_security.controller;
 
-import uc.security_ms.dto.CreateUserDTO;
-import uc.security_ms.dto.UpdateUserDTO;
-import uc.security_ms.dto.UserResponseDTO;
-import uc.security_ms.service.UserService;
+import com.uc.ms_security.dto.CreateUserDTO;
+import com.uc.ms_security.dto.UpdateUserDTO;
+import com.uc.ms_security.dto.UserResponseDTO;
+import com.uc.ms_security.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -997,7 +964,7 @@ public class UserController {
 
 ---
 
-# 25. Probar CREATE
+# 24. Probar CREATE
 
 ```http
 POST /api/users
@@ -1052,7 +1019,7 @@ Respuesta:
 
 ---
 
-# 26. Probar UPDATE sin contraseña
+# 25. Probar UPDATE sin contraseña
 
 ```http
 PUT /api/users/1
@@ -1079,7 +1046,7 @@ Como no llegó `password`, conserva el existente.
 
 ---
 
-# 27. Probar UPDATE con contraseña
+# 26. Probar UPDATE con contraseña
 
 ```json
 {
@@ -1095,7 +1062,7 @@ En este caso sí se modifica.
 
 ---
 
-# 28. Responsabilidad de cada capa
+# 27. Responsabilidad de cada capa
 
 Al terminar la práctica, la regla mental debería ser:
 

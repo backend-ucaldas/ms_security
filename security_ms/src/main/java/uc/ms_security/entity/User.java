@@ -35,4 +35,12 @@ public class User {
             nullable = false
     )
     private String password;
+
+    @OneToOne(
+            mappedBy = "user",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.LAZY
+    )
+    private Profile profile;
 }
