@@ -1,9 +1,6 @@
 package com.uc.ms_security.service;
 
-import com.uc.ms_security.dto.CreateUserDTO;
-import com.uc.ms_security.dto.UpdateUserDTO;
-import com.uc.ms_security.dto.UserDetailResponseDTO;
-import com.uc.ms_security.dto.UserResponseDTO;
+import com.uc.ms_security.dto.*;
 import com.uc.ms_security.entity.User;
 import com.uc.ms_security.mapper.UserMapper;
 import com.uc.ms_security.repository.UserRepository;
@@ -80,5 +77,17 @@ public class UserService {
     public void delete(Long id) {
         User user = findUser(id);
         userRepository.delete(user);
+    }
+    public UserSessionsResponseDTO findByIdAndSessions(Long id) {
+        User user = userRepository
+                .findWithSessionsById(id)
+                .orElseThrow(
+                        () -> new ResponseStatusException(
+                                HttpStatus.NOT_FOUND,
+                                "Usuario no encontrado"
+                        )
+                );
+
+        return userMapper.toSessionsResponseDTO(user);
     }
 }

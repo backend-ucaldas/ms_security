@@ -1,9 +1,6 @@
 package com.uc.ms_security.controller;
 
-import com.uc.ms_security.dto.CreateUserDTO;
-import com.uc.ms_security.dto.UpdateUserDTO;
-import com.uc.ms_security.dto.UserDetailResponseDTO;
-import com.uc.ms_security.dto.UserResponseDTO;
+import com.uc.ms_security.dto.*;
 import com.uc.ms_security.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -51,5 +48,11 @@ public class UserController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long id) {
         userService.delete(id);
+    }
+
+    @GetMapping("/{id}/detail-with-sessions")
+    public UserSessionsResponseDTO findByIdAndSessions(@PathVariable Long id) {
+
+        return userService.findByIdAndSessions(id);
     }
 }

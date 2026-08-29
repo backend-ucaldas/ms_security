@@ -16,4 +16,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findWithProfileById(
             Long id
     );
+
+    @EntityGraph(attributePaths = {"sessions"})
+    Optional<User> findWithSessionsById(Long id);
 }

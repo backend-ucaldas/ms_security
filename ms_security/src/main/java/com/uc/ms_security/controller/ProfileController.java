@@ -22,7 +22,7 @@ public class ProfileController {
             @Valid @RequestBody ProfileRequestDTO dto) {
         return profileService.create(userId, dto);
     }
-       
+
 
     @PutMapping
     public ProfileResponseDTO update(
