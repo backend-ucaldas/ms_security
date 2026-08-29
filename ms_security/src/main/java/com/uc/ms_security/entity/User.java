@@ -55,6 +55,14 @@ public class User {
     )
     private List<Session> sessions = new ArrayList<>();
 
+    @OneToMany(
+            mappedBy = "user",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.LAZY
+    )
+    private List<UserRole> userRoles = new ArrayList<>();
+
     public void addSession(Session session) {
         sessions.add(session);
         session.setUser(this);

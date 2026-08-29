@@ -90,4 +90,17 @@ public class UserService {
 
         return userMapper.toSessionsResponseDTO(user);
     }
+
+    public UserRolesResponseDTO findByIdAndRoles(Long id) {
+        User user = userRepository
+                .findWithRolesById(id)
+                .orElseThrow(
+                        () -> new ResponseStatusException(
+                                HttpStatus.NOT_FOUND,
+                                "Usuario no encontrado"
+                        )
+                );
+
+        return userMapper.toRolesResponseDTO(user);
+    }
 }

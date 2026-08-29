@@ -55,4 +55,11 @@ public class UserController {
 
         return userService.findByIdAndSessions(id);
     }
+
+    @GetMapping("/{id}/detail-with-roles")
+    public UserRolesResponseDTO findByIdAndRoles(
+            @PathVariable Long id) {
+
+        return userService.findByIdAndRoles(id);
+    }
 }

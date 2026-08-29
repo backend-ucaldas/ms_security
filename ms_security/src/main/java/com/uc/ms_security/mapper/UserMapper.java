@@ -13,6 +13,7 @@ public class UserMapper {
 
     private final ProfileMapper profileMapper;
     private final SessionMapper sessionMapper;
+    private final UserRoleMapper userRoleMapper;
 
     public User toEntity(CreateUserDTO dto) {
         User user = new User();
@@ -54,6 +55,15 @@ public class UserMapper {
                 user.getName(),
                 user.getEmail(),
                 sessionMapper.toResponseDTOList(user.getSessions())
+        );
+    }
+
+    public UserRolesResponseDTO toRolesResponseDTO(User user) {
+        return new UserRolesResponseDTO(
+                user.getId(),
+                user.getName(),
+                user.getEmail(),
+                userRoleMapper.toResponseDTOList(user.getUserRoles())
         );
     }
 
