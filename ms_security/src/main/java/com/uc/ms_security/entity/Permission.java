@@ -9,11 +9,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "roles")
+@Table(name = "permissions")
 @Getter
 @Setter
 @NoArgsConstructor
-public class Role {
+public class Permission {
 
     @Id
     @GeneratedValue(
@@ -23,25 +23,18 @@ public class Role {
 
     @Column(
             nullable = false,
-            unique = true,
-            length = 50
+            length = 255
     )
-    private String name;
+    private String url;
 
     @Column(
             nullable = false,
-            length = 255
+            length = 10
     )
-    private String description;
+    private String method;
 
     @OneToMany(
-            mappedBy = "role",
-            fetch = FetchType.LAZY
-    )
-    private List<UserRole> userRoles = new ArrayList<>();
-
-    @OneToMany(
-            mappedBy = "role",
+            mappedBy = "permission",
             fetch = FetchType.LAZY
     )
     private List<RolePermission> rolePermissions = new ArrayList<>();

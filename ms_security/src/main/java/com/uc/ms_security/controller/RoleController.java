@@ -1,5 +1,6 @@
 package com.uc.ms_security.controller;
 
+import com.uc.ms_security.dto.RolePermissionsResponseDTO;
 import com.uc.ms_security.dto.RoleRequestDTO;
 import com.uc.ms_security.dto.RoleResponseDTO;
 import com.uc.ms_security.service.RoleService;
@@ -46,5 +47,12 @@ public class RoleController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long id) {
         roleService.delete(id);
+    }
+
+    @GetMapping("/{id}/detail-with-permissions")
+    public RolePermissionsResponseDTO findByIdAndPermissions(
+            @PathVariable Long id) {
+
+        return roleService.findByIdAndPermissions(id);
     }
 }

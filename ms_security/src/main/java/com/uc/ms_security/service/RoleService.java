@@ -1,5 +1,6 @@
 package com.uc.ms_security.service;
 
+import com.uc.ms_security.dto.RolePermissionsResponseDTO;
 import com.uc.ms_security.dto.RoleRequestDTO;
 import com.uc.ms_security.dto.RoleResponseDTO;
 import com.uc.ms_security.entity.Role;
@@ -90,5 +91,18 @@ public class RoleService {
                                 "Rol no encontrado"
                         )
                 );
+    }
+
+    public RolePermissionsResponseDTO findByIdAndPermissions(Long id) {
+        Role role = roleRepository
+                .findWithPermissionsById(id)
+                .orElseThrow(
+                        () -> new ResponseStatusException(
+                                HttpStatus.NOT_FOUND,
+                                "Rol no encontrado"
+                        )
+                );
+
+        return roleMapper.toPermissionsResponseDTO(role);
     }
 }
