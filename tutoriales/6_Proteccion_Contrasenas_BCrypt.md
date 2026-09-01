@@ -495,6 +495,91 @@ La expresión regular significa:
 \S{8,72}          entre 8 y 72 caracteres, sin espacios
 ```
 
+## Devolver los errores de validación
+
+Las anotaciones de `CreateUserDTO` contienen los mensajes que debe recibir el
+cliente, pero necesitamos capturar la excepción de `@Valid` y convertirla en
+una respuesta JSON clara. Creamos:
+
+```text
+exception/GlobalExceptionHandler.java
+```
+
+```java
+package com.uc.ms_security.exception;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<Map<String, String>> handleValidation(
+        MethodArgumentNotValidException exception) {
+
+    Map<String, String> errors = new LinkedHashMap<>();
+
+    for (FieldError error : exception.getBindingResult().getFieldErrors()) {
+        errors.put(error.getField(), error.getDefaultMessage());
+    }
+
+    return ResponseEntity
+        .status(HttpStatus.BAD_REQUEST)
+        .body(errors);
+    }
+}
+```
+
+El flujo de una petición inválida queda así:
+
+```text
+JSON con contraseña insegura
+    ↓
+CreateUserDTO valida @NotBlank, @Size y @Pattern
+    ↓
+MethodArgumentNotValidException
+    ↓
+GlobalExceptionHandler
+    ↓
+400 Bad Request con campo y mensaje
+```
+
+Por ejemplo, para esta petición:
+
+```json
+{
+  "name": "Ana Gómez",
+  "email": "ana@mail.com",
+  "password": "clave123"
+}
+```
+
+la respuesta es:
+
+```json
+{
+  "password": "La contraseña debe contener al menos una mayúscula, una minúscula, un número y un carácter especial, sin espacios"
+}
+```
+
+Si varios campos son inválidos, se devuelve un mensaje para cada campo:
+
+```json
+{
+  "name": "El nombre es obligatorio",
+  "email": "El email no tiene un formato válido",
+  "password": "La contraseña debe tener entre 8 y 72 caracteres"
+}
+```
+
 ---
 
 # 13. Revisar `UpdateUserDTO`
