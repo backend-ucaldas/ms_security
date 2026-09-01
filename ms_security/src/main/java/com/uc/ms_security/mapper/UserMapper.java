@@ -15,21 +15,23 @@ public class UserMapper {
     private final SessionMapper sessionMapper;
     private final UserRoleMapper userRoleMapper;
 
-    public User toEntity(CreateUserDTO dto) {
+    public User toEntity(
+            CreateUserDTO dto,
+            String encodedPassword) {
+
         User user = new User();
         user.setName(dto.getName());
         user.setEmail(dto.getEmail());
-        user.setPassword(dto.getPassword());
+        user.setPassword(encodedPassword);
         return user;
     }
 
-    public void updateEntity(UpdateUserDTO dto, User user) {
+    public void updateBasicData(
+            UpdateUserDTO dto,
+            User user) {
+
         user.setName(dto.getName());
         user.setEmail(dto.getEmail());
-
-        if (dto.getPassword() != null) {
-            user.setPassword(dto.getPassword());
-        }
     }
 
     public UserResponseDTO toResponseDTO(User user) {
