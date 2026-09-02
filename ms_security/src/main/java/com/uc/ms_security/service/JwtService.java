@@ -1,4 +1,4 @@
-package com.uc.ms_security.security;
+package com.uc.ms_security.service;
 
 import com.uc.ms_security.dto.AuthResponseDTO;
 import com.uc.ms_security.entity.User;

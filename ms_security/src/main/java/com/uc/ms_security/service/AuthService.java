@@ -4,7 +4,6 @@ import com.uc.ms_security.dto.AuthResponseDTO;
 import com.uc.ms_security.dto.LoginRequestDTO;
 import com.uc.ms_security.entity.User;
 import com.uc.ms_security.repository.UserRepository;
-import com.uc.ms_security.security.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
