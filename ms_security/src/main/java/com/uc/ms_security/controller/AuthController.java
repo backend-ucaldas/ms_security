@@ -1,8 +1,8 @@
-package com.uc.ms_security.auth.controller;
+package com.uc.ms_security.controller;
 
-import com.uc.ms_security.auth.dto.AuthResponseDTO;
-import com.uc.ms_security.auth.dto.LoginRequestDTO;
-import com.uc.ms_security.auth.service.AuthService;
+import com.uc.ms_security.dto.AuthResponseDTO;
+import com.uc.ms_security.dto.LoginRequestDTO;
+import com.uc.ms_security.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;

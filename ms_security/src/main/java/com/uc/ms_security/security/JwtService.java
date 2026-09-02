@@ -1,6 +1,6 @@
 package com.uc.ms_security.security;
 
-import com.uc.ms_security.auth.dto.AuthResponseDTO;
+import com.uc.ms_security.dto.AuthResponseDTO;
 import com.uc.ms_security.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;

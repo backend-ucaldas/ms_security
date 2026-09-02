@@ -1,4 +1,4 @@
-package com.uc.ms_security.auth.dto;
+package com.uc.ms_security.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

@@ -104,14 +104,15 @@ Spring Security ya sabe leer y validar un JWT enviado como Bearer token.
 ~~~text
 src/main/java/com/uc/ms_security
 │
-├── auth
-│   ├── controller
-│   │   └── AuthController.java
-│   ├── dto
-│   │   ├── LoginRequestDTO.java
-│   │   └── AuthResponseDTO.java
-│   └── service
-│       └── AuthService.java
+├── controller
+│   └── AuthController.java
+│
+├── dto
+│   ├── LoginRequestDTO.java
+│   └── AuthResponseDTO.java
+│
+├── service
+│   └── AuthService.java
 │
 ├── config
 │   ├── JwtConfig.java
@@ -163,7 +164,7 @@ public interface UserRepository
 ### `LoginRequestDTO`
 
 ~~~java
-package com.uc.ms_security.auth.dto;
+package com.uc.ms_security.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -189,7 +190,7 @@ debe poder ingresar con la contraseña que ya registró.
 ### `AuthResponseDTO`
 
 ~~~java
-package com.uc.ms_security.auth.dto;
+package com.uc.ms_security.dto;
 
 import java.time.Instant;
 
@@ -314,7 +315,7 @@ JwtDecoder → valida el JWT recibido
 ~~~java
 package com.uc.ms_security.security;
 
-import com.uc.ms_security.auth.dto.AuthResponseDTO;
+import com.uc.ms_security.dto.AuthResponseDTO;
 import com.uc.ms_security.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
@@ -393,10 +394,10 @@ compara la contraseña mediante el `PasswordEncoder` de Spring Security y
 solicita la generación del JWT.
 
 ~~~java
-package com.uc.ms_security.auth.service;
+package com.uc.ms_security.service;
 
-import com.uc.ms_security.auth.dto.AuthResponseDTO;
-import com.uc.ms_security.auth.dto.LoginRequestDTO;
+import com.uc.ms_security.dto.AuthResponseDTO;
+import com.uc.ms_security.dto.LoginRequestDTO;
 import com.uc.ms_security.entity.User;
 import com.uc.ms_security.repository.UserRepository;
 import com.uc.ms_security.security.JwtService;
@@ -451,11 +452,11 @@ es incorrecta. De esta forma no revela qué usuarios están registrados.
 ## 12. Crear `AuthController`
 
 ~~~java
-package com.uc.ms_security.auth.controller;
+package com.uc.ms_security.controller;
 
-import com.uc.ms_security.auth.dto.AuthResponseDTO;
-import com.uc.ms_security.auth.dto.LoginRequestDTO;
-import com.uc.ms_security.auth.service.AuthService;
+import com.uc.ms_security.dto.AuthResponseDTO;
+import com.uc.ms_security.dto.LoginRequestDTO;
+import com.uc.ms_security.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;

@@ -1,7 +1,7 @@
-package com.uc.ms_security.auth.service;
+package com.uc.ms_security.service;
 
-import com.uc.ms_security.auth.dto.AuthResponseDTO;
-import com.uc.ms_security.auth.dto.LoginRequestDTO;
+import com.uc.ms_security.dto.AuthResponseDTO;
+import com.uc.ms_security.dto.LoginRequestDTO;
 import com.uc.ms_security.entity.User;
 import com.uc.ms_security.repository.UserRepository;
 import com.uc.ms_security.security.JwtService;
