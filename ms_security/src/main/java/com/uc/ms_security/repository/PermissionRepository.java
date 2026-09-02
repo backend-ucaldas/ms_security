@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface PermissionRepository extends JpaRepository<Permission, Long> {
 
@@ -18,6 +19,11 @@ public interface PermissionRepository extends JpaRepository<Permission, Long> {
             String url,
             String method,
             Long id
+    );
+
+    Optional<Permission> findByUrlAndMethod(
+            String url,
+            String method
     );
 
     @Query("""
