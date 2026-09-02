@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Locale;
 
 @Service
 @RequiredArgsConstructor
@@ -20,6 +21,24 @@ public class PermissionService {
     private final PermissionRepository permissionRepository;
     private final RolePermissionRepository rolePermissionRepository;
     private final PermissionMapper permissionMapper;
+
+    public boolean hasPermission(
+            Long userId,
+            String httpMethod,
+            String requestUrl) {
+
+        String normalizedUrl = normalizeUrl(requestUrl);
+
+        return permissionRepository
+                .findByUserIdAndMethodAndUrl(
+                        userId,
+                        httpMethod.toUpperCase(Locale.ROOT),
+                        normalizedUrl
+                )
+                .stream()
+                .findAny()
+                .isPresent();
+    }
 
     public PermissionResponseDTO create(PermissionRequestDTO dto) {
         if (permissionRepository.existsByUrlAndMethod(
@@ -92,4 +111,11 @@ public class PermissionService {
                         )
                 );
     }
+
+        private String normalizeUrl(String requestUrl) {
+                return requestUrl.replaceAll(
+                                "(?i)(?<=/)(?:\\d+|[a-f0-9]{24})(?=/|$)",
+                                "{id}"
+                );
+        }
 }

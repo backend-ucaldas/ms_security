@@ -9,7 +9,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "permissions")
+@Table(
+        name = "permissions",
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        name = "uk_permission_url_method",
+                        columnNames = {"url", "method"}
+                )
+        }
+)
 @Getter
 @Setter
 @NoArgsConstructor
