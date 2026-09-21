@@ -1,0 +1,13 @@
+@startuml
+
+left to right direction
+
+component "Cliente Web" as Cliente
+component "Backend" as Backend
+
+interface "REST API" as API
+
+Cliente --( API
+API -- Backend
+
+@enduml
