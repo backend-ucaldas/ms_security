@@ -1,392 +1,367 @@
-Un `Stream` en Java permite procesar los elementos de una colección mediante un flujo de operaciones. Para entenderlo, comparemos primero la forma tradicional con `for each`.
+# Guía: De `for each` a `Stream` en Java usando la clase `User`
 
-Supongamos esta lista:
-
-```java
-List<String> nombres = List.of("Ana", "Carlos", "Beatriz");
-```
-
-### 1. Recorrer los elementos
-
-Forma tradicional:
+## Clase de ejemplo
 
 ```java
-for (String nombre : nombres) {
-    System.out.println(nombre);
-}
-```
+public class User {
+    private Long id;
+    private String email;
+    private int age;
 
-Con `Stream`:
+    public User(Long id, String email, int age) {
+        this.id = id;
+        this.email = email;
+        this.age = age;
+    }
 
-```java
-nombres.stream()
-       .forEach(nombre -> System.out.println(nombre));
-```
+    public Long getId() {
+        return id;
+    }
 
-El `Stream` recorre la lista y ejecuta una acción sobre cada elemento. La expresión:
+    public String getEmail() {
+        return email;
+    }
 
-```java
-nombre -> System.out.println(nombre)
-```
-
-es una función lambda.
-
-Sin embargo, para un recorrido simple, el `for each` suele ser más claro.
-
----
-
-### 2. Filtrar elementos
-
-Supongamos que queremos obtener los nombres que empiezan por `"A"`.
-
-Forma tradicional:
-
-```java
-List<String> resultado = new ArrayList<>();
-
-for (String nombre : nombres) {
-    if (nombre.startsWith("A")) {
-        resultado.add(nombre);
+    public int getAge() {
+        return age;
     }
 }
 ```
 
-Con `Stream`:
+Lista de usuarios:
 
 ```java
-List<String> resultado = nombres.stream()
-        .filter(nombre -> nombre.startsWith("A"))
-        .toList();
+List<User> users = List.of(
+        new User(1L, "ana@gmail.com", 22),
+        new User(2L, "carlos@gmail.com", 17),
+        new User(3L, "beatriz@gmail.com", 30)
+);
 ```
-
-El método `filter()` conserva únicamente los elementos que cumplen la condición.
-
-En este caso:
-
-```java
-nombre -> nombre.startsWith("A")
-```
-
-significa: “recibe un nombre y verifica si comienza con A”.
 
 ---
 
-### 3. Transformar elementos
+## 1. Recorrer usuarios
 
-Supongamos que queremos convertir todos los nombres a mayúsculas.
+Objetivo: mostrar el correo de cada usuario.
 
-Forma tradicional:
+### Forma tradicional con `for each`
 
 ```java
-List<String> resultado = new ArrayList<>();
-
-for (String nombre : nombres) {
-    resultado.add(nombre.toUpperCase());
+for (User user : users) {
+    System.out.println(user.getEmail());
 }
 ```
 
-Con `Stream`:
+### Forma con `Stream`
 
 ```java
-List<String> resultado = nombres.stream()
-        .map(nombre -> nombre.toUpperCase())
+users.stream()
+     .forEach(user -> System.out.println(user.getEmail()));
+```
+
+El `Stream` recorre cada usuario y ejecuta una acción.
+
+---
+
+## 2. Filtrar usuarios
+
+Objetivo: obtener los usuarios mayores de edad.
+
+### Forma tradicional
+
+```java
+List<User> adults = new ArrayList<>();
+
+for (User user : users) {
+    if (user.getAge() >= 18) {
+        adults.add(user);
+    }
+}
+```
+
+### Forma con `Stream`
+
+```java
+List<User> adults = users.stream()
+        .filter(user -> user.getAge() >= 18)
         .toList();
 ```
 
-El método `map()` transforma cada elemento.
+`filter()` conserva únicamente los usuarios que cumplen la condición.
 
-Por ejemplo:
+---
+
+## 3. Obtener un atributo
+
+Objetivo: obtener solamente los correos de los usuarios.
+
+### Forma tradicional
+
+```java
+List<String> emails = new ArrayList<>();
+
+for (User user : users) {
+    emails.add(user.getEmail());
+}
+```
+
+### Forma con `Stream`
+
+```java
+List<String> emails = users.stream()
+        .map(user -> user.getEmail())
+        .toList();
+```
+
+`map()` transforma cada objeto `User` en su correo electrónico.
 
 ```text
-Ana      → ANA
-Carlos   → CARLOS
-Beatriz  → BEATRIZ
+User → email
 ```
 
 ---
 
-### 4. Filtrar y transformar
+## 4. Filtrar y obtener atributos
 
-Ahora queremos los nombres que empiezan por `"A"` y convertirlos a mayúsculas.
+Objetivo: obtener los correos de los usuarios mayores de edad.
 
-Forma tradicional:
+### Forma tradicional
 
 ```java
-List<String> resultado = new ArrayList<>();
+List<String> emails = new ArrayList<>();
 
-for (String nombre : nombres) {
-    if (nombre.startsWith("A")) {
-        resultado.add(nombre.toUpperCase());
+for (User user : users) {
+    if (user.getAge() >= 18) {
+        emails.add(user.getEmail());
     }
 }
 ```
 
-Con `Stream`:
+### Forma con `Stream`
 
 ```java
-List<String> resultado = nombres.stream()
-        .filter(nombre -> nombre.startsWith("A"))
-        .map(nombre -> nombre.toUpperCase())
+List<String> emails = users.stream()
+        .filter(user -> user.getAge() >= 18)
+        .map(user -> user.getEmail())
+        .toList();
+```
+
+El flujo realiza:
+
+```text
+Usuarios → Filtrar mayores de edad → Obtener correos → Crear lista
+```
+
+---
+
+## 5. Contar usuarios
+
+Objetivo: contar cuántos usuarios son mayores de edad.
+
+### Forma tradicional
+
+```java
+int counter = 0;
+
+for (User user : users) {
+    if (user.getAge() >= 18) {
+        counter++;
+    }
+}
+```
+
+### Forma con `Stream`
+
+```java
+long counter = users.stream()
+        .filter(user -> user.getAge() >= 18)
+        .count();
+```
+
+`count()` cuenta los usuarios que cumplen la condición.
+
+---
+
+## 6. Verificar si existe un usuario
+
+Objetivo: verificar si existe algún usuario menor de edad.
+
+### Forma tradicional
+
+```java
+boolean exists = false;
+
+for (User user : users) {
+    if (user.getAge() < 18) {
+        exists = true;
+        break;
+    }
+}
+```
+
+### Forma con `Stream`
+
+```java
+boolean exists = users.stream()
+        .anyMatch(user -> user.getAge() < 18);
+```
+
+`anyMatch()` devuelve `true` si al menos un usuario cumple la condición.
+
+---
+
+## 7. Verificar si todos cumplen
+
+Objetivo: verificar si todos los usuarios son mayores de edad.
+
+### Forma tradicional
+
+```java
+boolean allAdults = true;
+
+for (User user : users) {
+    if (user.getAge() < 18) {
+        allAdults = false;
+        break;
+    }
+}
+```
+
+### Forma con `Stream`
+
+```java
+boolean allAdults = users.stream()
+        .allMatch(user -> user.getAge() >= 18);
+```
+
+`allMatch()` devuelve `true` solamente si todos cumplen la condición.
+
+---
+
+## 8. Buscar un usuario
+
+Objetivo: encontrar el primer usuario cuyo correo sea de Gmail.
+
+### Forma tradicional
+
+```java
+User result = null;
+
+for (User user : users) {
+    if (user.getEmail().endsWith("@gmail.com")) {
+        result = user;
+        break;
+    }
+}
+```
+
+### Forma con `Stream`
+
+```java
+Optional<User> result = users.stream()
+        .filter(user -> user.getEmail().endsWith("@gmail.com"))
+        .findFirst();
+```
+
+`findFirst()` obtiene el primer usuario que cumple la condición.
+
+---
+
+## 9. Ordenar usuarios
+
+Objetivo: ordenar los usuarios de menor a mayor edad.
+
+### Forma tradicional
+
+```java
+List<User> orderedUsers = new ArrayList<>(users);
+
+orderedUsers.sort(
+        Comparator.comparing(User::getAge)
+);
+```
+
+### Forma con `Stream`
+
+```java
+List<User> orderedUsers = users.stream()
+        .sorted(Comparator.comparing(User::getAge))
+        .toList();
+```
+
+`sorted()` ordena los elementos del flujo.
+
+---
+
+## 10. Obtener la edad promedio
+
+Objetivo: calcular la edad promedio de los usuarios.
+
+### Forma tradicional
+
+```java
+int totalAge = 0;
+
+for (User user : users) {
+    totalAge += user.getAge();
+}
+
+double averageAge = (double) totalAge / users.size();
+```
+
+### Forma con `Stream`
+
+```java
+double averageAge = users.stream()
+        .mapToInt(User::getAge)
+        .average()
+        .orElse(0);
+```
+
+`mapToInt()` obtiene las edades y `average()` calcula el promedio.
+
+---
+
+## 11. Ejemplo completo
+
+Objetivo: obtener los correos de los usuarios mayores de edad, ordenados alfabéticamente.
+
+### Forma tradicional
+
+```java
+List<String> emails = new ArrayList<>();
+
+for (User user : users) {
+    if (user.getAge() >= 18) {
+        emails.add(user.getEmail());
+    }
+}
+
+emails.sort(String::compareTo);
+```
+
+### Forma con `Stream`
+
+```java
+List<String> emails = users.stream()
+        .filter(user -> user.getAge() >= 18)
+        .map(User::getEmail)
+        .sorted()
         .toList();
 ```
 
 El flujo funciona así:
 
 ```text
-Lista
-  ↓
-filter()
-  ↓
-map()
-  ↓
-toList()
+List<User>
+   ↓
+filter()   → conserva adultos
+   ↓
+map()      → obtiene sus correos
+   ↓
+sorted()   → ordena los correos
+   ↓
+toList()   → crea la lista final
 ```
 
-Cada operación realiza una tarea específica.
-
----
-
-### 5. Contar elementos
-
-Supongamos que queremos contar cuántos nombres empiezan por `"A"`.
-
-Forma tradicional:
-
-```java
-int contador = 0;
-
-for (String nombre : nombres) {
-    if (nombre.startsWith("A")) {
-        contador++;
-    }
-}
-```
-
-Con `Stream`:
-
-```java
-long contador = nombres.stream()
-        .filter(nombre -> nombre.startsWith("A"))
-        .count();
-```
-
-El método `count()` devuelve la cantidad de elementos que quedaron después del filtro.
-
----
-
-### 6. Verificar condiciones
-
-Supongamos que queremos saber si existe algún nombre que empiece por `"A"`.
-
-Forma tradicional:
-
-```java
-boolean existe = false;
-
-for (String nombre : nombres) {
-    if (nombre.startsWith("A")) {
-        existe = true;
-        break;
-    }
-}
-```
-
-Con `Stream`:
-
-```java
-boolean existe = nombres.stream()
-        .anyMatch(nombre -> nombre.startsWith("A"));
-```
-
-Algunos métodos similares son:
-
-```java
-anyMatch();   // Al menos uno cumple
-allMatch();   // Todos cumplen
-noneMatch();  // Ninguno cumple
-```
-
-Ejemplo:
-
-```java
-boolean todosTienenNombre = nombres.stream()
-        .allMatch(nombre -> !nombre.isEmpty());
-```
-
----
-
-### 7. Buscar un elemento
-
-Forma tradicional:
-
-```java
-String encontrado = null;
-
-for (String nombre : nombres) {
-    if (nombre.startsWith("A")) {
-        encontrado = nombre;
-        break;
-    }
-}
-```
-
-Con `Stream`:
-
-```java
-Optional<String> encontrado = nombres.stream()
-        .filter(nombre -> nombre.startsWith("A"))
-        .findFirst();
-```
-
-El resultado es un `Optional` porque puede existir o no un elemento que cumpla la condición.
-
-Para obtenerlo de forma segura:
-
-```java
-encontrado.ifPresent(nombre -> System.out.println(nombre));
-```
-
----
-
-### 8. Ordenar elementos
-
-Forma tradicional:
-
-```java
-List<String> resultado = new ArrayList<>(nombres);
-resultado.sort(String::compareTo);
-```
-
-Con `Stream`:
-
-```java
-List<String> resultado = nombres.stream()
-        .sorted()
-        .toList();
-```
-
-El método `sorted()` ordena los elementos y produce un nuevo resultado.
-
----
-
-### 9. Eliminar elementos repetidos
-
-Supongamos:
-
-```java
-List<Integer> numeros = List.of(1, 2, 2, 3, 3, 4);
-```
-
-Forma tradicional:
-
-```java
-Set<Integer> resultado = new HashSet<>();
-
-for (Integer numero : numeros) {
-    resultado.add(numero);
-}
-```
-
-Con `Stream`:
-
-```java
-List<Integer> resultado = numeros.stream()
-        .distinct()
-        .toList();
-```
-
-`distinct()` elimina los elementos repetidos.
-
----
-
-### 10. Combinar todos los elementos
-
-Supongamos que queremos sumar números.
-
-Forma tradicional:
-
-```java
-int suma = 0;
-
-for (Integer numero : numeros) {
-    suma += numero;
-}
-```
-
-Con `Stream`:
-
-```java
-int suma = numeros.stream()
-        .reduce(0, (total, numero) -> total + numero);
-```
-
-El método `reduce()` combina todos los elementos para obtener un único resultado.
-
-También puede escribirse:
-
-```java
-int suma = numeros.stream()
-        .mapToInt(numero -> numero)
-        .sum();
-```
-
----
-
-### 11. Ejemplo más completo
-
-Lista de usuarios:
-
-```java
-List<User> users = userRepository.findAll();
-```
-
-Forma tradicional:
-
-```java
-List<String> nombres = new ArrayList<>();
-
-for (User user : users) {
-    if (user.isActive()) {
-        nombres.add(user.getName().toUpperCase());
-    }
-}
-
-nombres.sort(String::compareTo);
-```
-
-Con `Stream`:
-
-```java
-List<String> nombres = users.stream()
-        .filter(User::isActive)
-        .map(user -> user.getName().toUpperCase())
-        .sorted()
-        .toList();
-```
-
-Este flujo:
-
-1. Obtiene todos los usuarios.
-2. Conserva únicamente los activos.
-3. Extrae sus nombres.
-4. Convierte los nombres a mayúsculas.
-5. Los ordena.
-6. Crea una nueva lista.
-
----
-
-### Idea principal
-
-El `for each` indica paso a paso cómo recorrer y procesar los datos.
-
-El `Stream` indica qué operaciones se desean realizar sobre los datos:
-
-```java
-users.stream()
-     .filter(...)
-     .map(...)
-     .sorted()
-     .toList();
-```
-
-Por eso, un `Stream` permite expresar el procesamiento de forma más declarativa y encadenada. La lógica sigue siendo equivalente a utilizar ciclos, condiciones y acumuladores, pero se organiza como un flujo de operaciones.
+La diferencia es que el `for each` describe cada paso manualmente, mientras que el `Stream` expresa el proceso como una cadena de operaciones.
