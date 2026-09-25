@@ -531,9 +531,9 @@ mapper/UserMapper.java
 ```java
 package com.uc.ms_security.mapper;
 
-import com.uc.ms_security.dto.CreateUserDTO;
-import com.uc.ms_security.dto.UpdateUserDTO;
-import com.uc.ms_security.dto.UserResponseDTO;
+import com.uc.ms_security.dto.user.CreateUserDTO;
+import com.uc.ms_security.dto.user.UpdateUserDTO;
+import com.uc.ms_security.dto.user.UserResponseDTO;
 import com.uc.ms_security.entity.User;
 import org.springframework.stereotype.Component;
 
