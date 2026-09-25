@@ -499,7 +499,8 @@ La expresión regular significa:
 
 Las anotaciones de `CreateUserDTO` contienen los mensajes que debe recibir el
 cliente, pero necesitamos capturar la excepción de `@Valid` y convertirla en
-una respuesta JSON clara. Creamos:
+una respuesta JSON clara. Si ya existe `GlobalExceptionHandler` por el manejo
+de `ApplicationException`, se conserva y se agrega este método de validación:
 
 ```text
 exception/GlobalExceptionHandler.java
@@ -518,11 +519,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-@RestControllerAdvice
-public class GlobalExceptionHandler {
-
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, String>> handleValidation(
+@ExceptionHandler(MethodArgumentNotValidException.class)
+public ResponseEntity<Map<String, String>> handleValidation(
         MethodArgumentNotValidException exception) {
 
     Map<String, String> errors = new LinkedHashMap<>();
@@ -534,7 +532,6 @@ public class GlobalExceptionHandler {
     return ResponseEntity
         .status(HttpStatus.BAD_REQUEST)
         .body(errors);
-    }
 }
 ```
 
