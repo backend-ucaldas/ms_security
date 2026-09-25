@@ -480,7 +480,7 @@ El DTO de respuesta nunca debe devolver la contraseña.
 Podemos aprovechar Lombok con `@Value`:
 
 ```java
-package com.uc.ms_security.dto;
+package com.uc.ms_security.dto.user;
 
 import lombok.Value;
 
