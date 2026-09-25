@@ -1144,9 +1144,9 @@ public UserSessionsResponseDTO findByIdAndSessions(Long id) {
     User user = userRepository
             .findWithSessionsById(id)
             .orElseThrow(
-                    () -> new ResponseStatusException(
-                            HttpStatus.NOT_FOUND,
-                            "Usuario no encontrado"
+            () -> new ApplicationException(
+                ErrorCase.NOT_FOUND,
+                "Usuario no encontrado con id: " + id
                     )
             );
 
@@ -1214,13 +1214,13 @@ import com.uc.ms_security.dto.SessionRequestDTO;
 import com.uc.ms_security.dto.SessionResponseDTO;
 import com.uc.ms_security.entity.Session;
 import com.uc.ms_security.entity.User;
+import com.uc.ms_security.exception.ApplicationException;
+import com.uc.ms_security.exception.ErrorCase;
 import com.uc.ms_security.mapper.SessionMapper;
 import com.uc.ms_security.repository.SessionRepository;
 import com.uc.ms_security.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -1239,8 +1239,8 @@ public class SessionService {
         User user = findUser(userId);
 
         if (sessionRepository.existsByToken(dto.getToken())) {
-            throw new ResponseStatusException(
-                    HttpStatus.CONFLICT,
+            throw new ApplicationException(
+                ErrorCase.ALREADY_EXISTS,
                     "El token ya está registrado"
             );
         }
@@ -1282,8 +1282,8 @@ public class SessionService {
                 dto.getToken(),
                 sessionId)) {
 
-            throw new ResponseStatusException(
-                    HttpStatus.CONFLICT,
+                throw new ApplicationException(
+                    ErrorCase.ALREADY_EXISTS,
                     "El token ya está registrado"
             );
         }
@@ -1307,9 +1307,9 @@ public class SessionService {
     private User findUser(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(
-                        () -> new ResponseStatusException(
-                                HttpStatus.NOT_FOUND,
-                                "Usuario no encontrado"
+                    () -> new ApplicationException(
+                        ErrorCase.NOT_FOUND,
+                        "Usuario no encontrado con id: " + userId
                         )
                 );
     }
@@ -1321,9 +1321,9 @@ public class SessionService {
         return sessionRepository
                 .findByIdAndUserId(sessionId, userId)
                 .orElseThrow(
-                        () -> new ResponseStatusException(
-                                HttpStatus.NOT_FOUND,
-                                "Sesión no encontrada para este usuario"
+                    () -> new ApplicationException(
+                        ErrorCase.NOT_FOUND,
+                        "Sesión no encontrada para este usuario"
                         )
                 );
     }

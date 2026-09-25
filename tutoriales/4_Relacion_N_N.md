@@ -786,13 +786,13 @@ package com.uc.ms_security.service;
 import com.uc.ms_security.dto.RoleRequestDTO;
 import com.uc.ms_security.dto.RoleResponseDTO;
 import com.uc.ms_security.entity.Role;
+import com.uc.ms_security.exception.ApplicationException;
+import com.uc.ms_security.exception.ErrorCase;
 import com.uc.ms_security.mapper.RoleMapper;
 import com.uc.ms_security.repository.RoleRepository;
 import com.uc.ms_security.repository.UserRoleRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -806,8 +806,8 @@ public class RoleService {
 
     public RoleResponseDTO create(RoleRequestDTO dto) {
         if (roleRepository.existsByNameIgnoreCase(dto.getName())) {
-            throw new ResponseStatusException(
-                    HttpStatus.CONFLICT,
+            throw new ApplicationException(
+                    ErrorCase.ALREADY_EXISTS,
                     "Ya existe un rol con ese nombre"
             );
         }
@@ -839,8 +839,8 @@ public class RoleService {
 
         if (roleRepository.existsByNameIgnoreCaseAndIdNot(
                 dto.getName(), id)) {
-            throw new ResponseStatusException(
-                    HttpStatus.CONFLICT,
+            throw new ApplicationException(
+                    ErrorCase.ALREADY_EXISTS,
                     "Ya existe un rol con ese nombre"
             );
         }
@@ -856,8 +856,8 @@ public class RoleService {
         Role role = findEntityById(id);
 
         if (userRoleRepository.existsByRoleId(id)) {
-            throw new ResponseStatusException(
-                    HttpStatus.CONFLICT,
+            throw new ApplicationException(
+                    ErrorCase.INVALID_OPERATION,
                     "No se puede eliminar un rol que está asignado"
             );
         }
@@ -868,8 +868,8 @@ public class RoleService {
     private Role findEntityById(Long id) {
         return roleRepository.findById(id)
                 .orElseThrow(
-                        () -> new ResponseStatusException(
-                                HttpStatus.NOT_FOUND,
+                        () -> new ApplicationException(
+                                ErrorCase.NOT_FOUND,
                                 "Rol no encontrado"
                         )
                 );
@@ -947,15 +947,15 @@ import com.uc.ms_security.dto.UserRoleResponseDTO;
 import com.uc.ms_security.entity.Role;
 import com.uc.ms_security.entity.User;
 import com.uc.ms_security.entity.UserRole;
+import com.uc.ms_security.exception.ApplicationException;
+import com.uc.ms_security.exception.ErrorCase;
 import com.uc.ms_security.mapper.UserRoleMapper;
 import com.uc.ms_security.repository.RoleRepository;
 import com.uc.ms_security.repository.UserRepository;
 import com.uc.ms_security.repository.UserRoleRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -974,16 +974,16 @@ public class UserRoleService {
 
         User user = userRepository.findById(dto.getUserId())
                 .orElseThrow(
-                        () -> new ResponseStatusException(
-                                HttpStatus.NOT_FOUND,
+                        () -> new ApplicationException(
+                                ErrorCase.NOT_FOUND,
                                 "Usuario no encontrado"
                         )
                 );
 
         Role role = roleRepository.findById(dto.getRoleId())
                 .orElseThrow(
-                        () -> new ResponseStatusException(
-                                HttpStatus.NOT_FOUND,
+                        () -> new ApplicationException(
+                                ErrorCase.NOT_FOUND,
                                 "Rol no encontrado"
                         )
                 );
@@ -991,8 +991,8 @@ public class UserRoleService {
         if (userRoleRepository.existsByUserIdAndRoleId(
                 dto.getUserId(),
                 dto.getRoleId())) {
-            throw new ResponseStatusException(
-                    HttpStatus.CONFLICT,
+            throw new ApplicationException(
+                    ErrorCase.ALREADY_EXISTS,
                     "El usuario ya tiene asignado ese rol"
             );
         }
@@ -1037,8 +1037,8 @@ public class UserRoleService {
     private UserRole findAssignment(Long userId, Long roleId) {
         return userRoleRepository.findByUserIdAndRoleId(userId, roleId)
                 .orElseThrow(
-                        () -> new ResponseStatusException(
-                                HttpStatus.NOT_FOUND,
+                        () -> new ApplicationException(
+                                ErrorCase.NOT_FOUND,
                                 "Asignación de rol no encontrada"
                         )
                 );
@@ -1345,9 +1345,9 @@ public UserRolesResponseDTO findByIdAndRoles(Long id) {
     User user = userRepository
             .findWithRolesById(id)
             .orElseThrow(
-                    () -> new ResponseStatusException(
-                            HttpStatus.NOT_FOUND,
-                            "Usuario no encontrado"
+                    () -> new ApplicationException(
+                            ErrorCase.NOT_FOUND,
+                            "Usuario no encontrado con id: " + id
                     )
             );
 

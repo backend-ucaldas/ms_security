@@ -131,6 +131,40 @@ if (userRepository.existsByEmail(dto.getEmail())) {
 
 Así, todos los services reutilizan la misma excepción y comunican el problema sin decidir cómo debe responder la API.
 
+El `RoleService` utiliza los mismos casos para sus operaciones:
+
+```java
+private Role findEntityById(Long id) {
+    return roleRepository.findById(id)
+        .orElseThrow(() -> new ApplicationException(
+            ErrorCase.NOT_FOUND,
+            "Rol no encontrado con id: " + id
+        ));
+}
+```
+
+Para evitar nombres de rol duplicados:
+
+```java
+if (roleRepository.existsByNameIgnoreCase(dto.getName())) {
+    throw new ApplicationException(
+        ErrorCase.ALREADY_EXISTS,
+        "Ya existe un rol con ese nombre"
+    );
+}
+```
+
+Si se intenta eliminar un rol asignado a un usuario, se utiliza `INVALID_OPERATION`:
+
+```java
+if (userRoleRepository.existsByRoleId(id)) {
+    throw new ApplicationException(
+        ErrorCase.INVALID_OPERATION,
+        "No se puede eliminar un rol que está asignado"
+    );
+}
+```
+
 ### 6. Crear el manejador global de excepciones
 
 En el paquete `exception`, crea `GlobalExceptionHandler.java`:
@@ -144,14 +178,20 @@ package com.uc.ms_security.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.server.ResponseStatusException;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(ApplicationException.class)
-    public ResponseEntity<String> handleApplicationException(
+    public ResponseEntity<Map<String, String>> handleApplicationException(
             ApplicationException exception) {
 
         HttpStatus status = switch (exception.getErrorCase()) {
@@ -160,23 +200,77 @@ public class GlobalExceptionHandler {
             case INVALID_OPERATION -> HttpStatus.BAD_REQUEST;
         };
 
+        Map<String, String> error = new LinkedHashMap<>();
+        error.put("errorCase", exception.getErrorCase().name());
+        error.put("message", exception.getMessage());
+
         return ResponseEntity
                 .status(status)
-                .body(exception.getMessage());
+                .body(error);
+    }
+
+    @ExceptionHandler(ResponseStatusException.class)
+    public ResponseEntity<Map<String, String>> handleResponseStatusException(
+            ResponseStatusException exception) {
+
+        Map<String, String> error = new LinkedHashMap<>();
+        error.put("errorCase", "HTTP_ERROR");
+        error.put("message", exception.getReason());
+
+        return ResponseEntity
+                .status(exception.getStatusCode())
+                .body(error);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<Map<String, String>> handleValidation(
+            MethodArgumentNotValidException exception) {
+
+        Map<String, String> errors = new LinkedHashMap<>();
+
+        for (FieldError error : exception.getBindingResult().getFieldErrors()) {
+            errors.put(error.getField(), error.getDefaultMessage());
+        }
+
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(errors);
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<String> handleUnexpectedException(
+    public ResponseEntity<Map<String, String>> handleUnexpectedException(
             Exception exception) {
+
+        Map<String, String> error = new LinkedHashMap<>();
+        error.put("errorCase", "INTERNAL_ERROR");
+        error.put("message", "Ocurrió un error interno en el servidor");
 
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("Ocurrió un error interno en el servidor");
+                .body(error);
     }
 }
 ```
 
 La anotación `@RestControllerAdvice` permite que Spring detecte el manejador y aplique sus métodos a las excepciones que ocurran durante las solicitudes de la API. No es necesario agregar un `try-catch` en cada método del controlador.
+
+Las excepciones de aplicación se devuelven como JSON. Por ejemplo, un usuario no encontrado produce:
+
+```json
+{
+    "errorCase": "NOT_FOUND",
+    "message": "Usuario no encontrado con id: 9"
+}
+```
+
+Las excepciones inesperadas producen una respuesta `500` con este formato:
+
+```json
+{
+    "errorCase": "INTERNAL_ERROR",
+    "message": "Ocurrió un error interno en el servidor"
+}
+```
 
 ### 7. Estructura final del proyecto
 

@@ -397,12 +397,12 @@ package com.uc.ms_security.service;
 import com.uc.ms_security.dto.AuthResponseDTO;
 import com.uc.ms_security.dto.LoginRequestDTO;
 import com.uc.ms_security.entity.User;
+import com.uc.ms_security.exception.ApplicationException;
+import com.uc.ms_security.exception.ErrorCase;
 import com.uc.ms_security.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @RequiredArgsConstructor
@@ -432,11 +432,11 @@ public class AuthService {
         return jwtService.generateToken(user);
     }
 
-    private ResponseStatusException unauthorized() {
-        return new ResponseStatusException(
-                HttpStatus.UNAUTHORIZED,
-                "Credenciales incorrectas"
-        );
+        private ApplicationException unauthorized() {
+                return new ApplicationException(
+                                ErrorCase.UNAUTHORIZED,
+                                "Credenciales incorrectas"
+                );
     }
 }
 ~~~

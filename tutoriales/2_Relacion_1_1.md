@@ -1019,9 +1019,9 @@ public UserDetailResponseDTO findByIdAndProfile(Long id) {
         User user =userRepository
                         .findWithProfileById(id)
                         .orElseThrow(
-                                () -> new ResponseStatusException(
-                                        HttpStatus.NOT_FOUND,
-                                        "Usuario no encontrado"
+                                () -> new ApplicationException(
+                                    ErrorCase.NOT_FOUND,
+                                    "Usuario no encontrado con id: " + id
                                 )
                         );
 
@@ -1125,13 +1125,13 @@ import com.uc.ms_security.dto.ProfileRequestDTO;
 import com.uc.ms_security.dto.ProfileResponseDTO;
 import com.uc.ms_security.entity.Profile;
 import com.uc.ms_security.entity.User;
+import com.uc.ms_security.exception.ApplicationException;
+import com.uc.ms_security.exception.ErrorCase;
 import com.uc.ms_security.mapper.ProfileMapper;
 import com.uc.ms_security.repository.ProfileRepository;
 import com.uc.ms_security.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @RequiredArgsConstructor
@@ -1143,14 +1143,14 @@ public class ProfileService {
 
     public ProfileResponseDTO create(Long userId, ProfileRequestDTO dto) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Usuario no encontrado"
+            .orElseThrow(() -> new ApplicationException(
+                ErrorCase.NOT_FOUND,
+                "Usuario no encontrado con id: " + userId
                 ));
 
         if (profileRepository.existsByUserId(userId)) {
-            throw new ResponseStatusException(
-                    HttpStatus.CONFLICT,
+            throw new ApplicationException(
+                ErrorCase.ALREADY_EXISTS,
                     "El usuario ya tiene un perfil"
             );
         }
@@ -1181,9 +1181,9 @@ public class ProfileService {
 
     private Profile findProfile(Long userId) {
         return profileRepository.findByUserId(userId)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Perfil no encontrado"
+            .orElseThrow(() -> new ApplicationException(
+                ErrorCase.NOT_FOUND,
+                "Perfil no encontrado para el usuario con id: " + userId
                 ));
     }
 }
