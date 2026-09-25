@@ -333,7 +333,7 @@ dto/BaseUserDTO.java
 ```
 
 ```java
-package com.uc.ms_security.dto;
+package com.uc.ms_security.dto.user;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -388,7 +388,7 @@ dto/CreateUserDTO.java
 ```
 
 ```java
-package com.uc.ms_security.dto;
+package com.uc.ms_security.dto.user;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -436,7 +436,7 @@ dto/UpdateUserDTO.java
 ```
 
 ```java
-package com.uc.ms_security.dto;
+package com.uc.ms_security.dto.user;
 
 import jakarta.validation.constraints.Size;
 
