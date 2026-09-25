@@ -2,14 +2,14 @@ package com.uc.ms_security.service;
 
 import com.uc.ms_security.dto.*;
 import com.uc.ms_security.entity.User;
+import com.uc.ms_security.exception.ApplicationException;
+import com.uc.ms_security.exception.ErrorCase;
 import com.uc.ms_security.mapper.UserMapper;
 import com.uc.ms_security.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -25,8 +25,8 @@ public class UserService {
 
     public UserResponseDTO create(CreateUserDTO dto) {
         if (userRepository.existsByEmail(dto.getEmail())) {
-            throw new ResponseStatusException(
-                    HttpStatus.CONFLICT,
+            throw new ApplicationException(
+                ErrorCase.ALREADY_EXISTS,
                     "Ya existe un usuario con este email"
             );
         }
@@ -43,10 +43,10 @@ public class UserService {
     }
     private User findUser(Long id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Usuario no encontrado"
-                ));
+            .orElseThrow(() -> new ApplicationException(
+                ErrorCase.NOT_FOUND,
+                "Usuario no encontrado con id: " + id
+            ));
     }
 
     public UserResponseDTO findById(Long id) {
@@ -58,9 +58,9 @@ public class UserService {
         User user =userRepository
                         .findWithProfileById(id)
                         .orElseThrow(
-                                () -> new ResponseStatusException(
-                                        HttpStatus.NOT_FOUND,
-                                        "Usuario no encontrado"
+                            () -> new ApplicationException(
+                                ErrorCase.NOT_FOUND,
+                                "Usuario no encontrado con id: " + id
                                 )
                         );
 
@@ -70,8 +70,8 @@ public class UserService {
     public UserResponseDTO update(Long id, UpdateUserDTO dto) {
         User user = findUser(id);
         if (userRepository.existsByEmailAndIdNot(dto.getEmail(), id)) {
-            throw new ResponseStatusException(
-                    HttpStatus.CONFLICT,
+            throw new ApplicationException(
+                ErrorCase.ALREADY_EXISTS,
                     "El email pertenece a otro usuario"
             );
         }
@@ -92,9 +92,9 @@ public class UserService {
         User user = userRepository
                 .findWithSessionsById(id)
                 .orElseThrow(
-                        () -> new ResponseStatusException(
-                                HttpStatus.NOT_FOUND,
-                                "Usuario no encontrado"
+                    () -> new ApplicationException(
+                        ErrorCase.NOT_FOUND,
+                        "Usuario no encontrado con id: " + id
                         )
                 );
 
@@ -105,9 +105,9 @@ public class UserService {
         User user = userRepository
                 .findWithRolesById(id)
                 .orElseThrow(
-                        () -> new ResponseStatusException(
-                                HttpStatus.NOT_FOUND,
-                                "Usuario no encontrado"
+                    () -> new ApplicationException(
+                        ErrorCase.NOT_FOUND,
+                        "Usuario no encontrado con id: " + id
                         )
                 );
 
