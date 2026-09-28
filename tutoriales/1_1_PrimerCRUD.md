@@ -692,9 +692,9 @@ service/UserService.java
 ```java
 package com.uc.ms_security.service;
 
-import com.uc.ms_security.dto.CreateUserDTO;
-import com.uc.ms_security.dto.UpdateUserDTO;
-import com.uc.ms_security.dto.UserResponseDTO;
+import com.uc.ms_security.dto.user.CreateUserDTO;
+import com.uc.ms_security.dto.user.UpdateUserDTO;
+import com.uc.ms_security.dto.user.UserResponseDTO;
 import com.uc.ms_security.entity.User;
 import com.uc.ms_security.mapper.UserMapper;
 import com.uc.ms_security.repository.UserRepository;
@@ -914,9 +914,9 @@ También podemos aprovechar Lombok para la inyección de dependencias.
 ```java
 package com.uc.ms_security.controller;
 
-import com.uc.ms_security.dto.CreateUserDTO;
-import com.uc.ms_security.dto.UpdateUserDTO;
-import com.uc.ms_security.dto.UserResponseDTO;
+import com.uc.ms_security.dto.user.CreateUserDTO;
+import com.uc.ms_security.dto.user.UpdateUserDTO;
+import com.uc.ms_security.dto.user.UserResponseDTO;
 import com.uc.ms_security.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
