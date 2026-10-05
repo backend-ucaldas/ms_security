@@ -1065,7 +1065,7 @@ ahora agregaremos :
 Así:
 
 ```http
-GET /api/users/1/profile
+GET /api/users/1/detail
 ```
 
 devuelve:
