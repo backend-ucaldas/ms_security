@@ -1054,7 +1054,7 @@ Nuestro endpoint:
 ahora agregaremos :
 
 ```java
-@GetMapping("/{id}/profile")
+@GetMapping("/{id}/detail")
     public UserDetailResponseDTO findByIdAndProfile(
             @PathVariable Long id) {
 
