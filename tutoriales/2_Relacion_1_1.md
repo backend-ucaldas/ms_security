@@ -1054,7 +1054,7 @@ Nuestro endpoint:
 ahora agregaremos :
 
 ```java
-@GetMapping("/{id}/profile")
+@GetMapping("/{id}/detail")
     public UserDetailResponseDTO findByIdAndProfile(
             @PathVariable Long id) {
 
@@ -1065,7 +1065,7 @@ ahora agregaremos :
 Así:
 
 ```http
-GET /api/users/1/profile
+GET /api/users/1/detail
 ```
 
 devuelve:

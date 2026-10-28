@@ -333,7 +333,7 @@ dto/BaseUserDTO.java
 ```
 
 ```java
-package com.uc.ms_security.dto;
+package com.uc.ms_security.dto.user;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -388,7 +388,7 @@ dto/CreateUserDTO.java
 ```
 
 ```java
-package com.uc.ms_security.dto;
+package com.uc.ms_security.dto.user;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -436,7 +436,7 @@ dto/UpdateUserDTO.java
 ```
 
 ```java
-package com.uc.ms_security.dto;
+package com.uc.ms_security.dto.user;
 
 import jakarta.validation.constraints.Size;
 
@@ -480,7 +480,7 @@ El DTO de respuesta nunca debe devolver la contraseña.
 Podemos aprovechar Lombok con `@Value`:
 
 ```java
-package com.uc.ms_security.dto;
+package com.uc.ms_security.dto.user;
 
 import lombok.Value;
 
@@ -531,9 +531,9 @@ mapper/UserMapper.java
 ```java
 package com.uc.ms_security.mapper;
 
-import com.uc.ms_security.dto.CreateUserDTO;
-import com.uc.ms_security.dto.UpdateUserDTO;
-import com.uc.ms_security.dto.UserResponseDTO;
+import com.uc.ms_security.dto.user.CreateUserDTO;
+import com.uc.ms_security.dto.user.UpdateUserDTO;
+import com.uc.ms_security.dto.user.UserResponseDTO;
 import com.uc.ms_security.entity.User;
 import org.springframework.stereotype.Component;
 
@@ -692,9 +692,9 @@ service/UserService.java
 ```java
 package com.uc.ms_security.service;
 
-import com.uc.ms_security.dto.CreateUserDTO;
-import com.uc.ms_security.dto.UpdateUserDTO;
-import com.uc.ms_security.dto.UserResponseDTO;
+import com.uc.ms_security.dto.user.CreateUserDTO;
+import com.uc.ms_security.dto.user.UpdateUserDTO;
+import com.uc.ms_security.dto.user.UserResponseDTO;
 import com.uc.ms_security.entity.User;
 import com.uc.ms_security.mapper.UserMapper;
 import com.uc.ms_security.repository.UserRepository;
@@ -914,9 +914,9 @@ También podemos aprovechar Lombok para la inyección de dependencias.
 ```java
 package com.uc.ms_security.controller;
 
-import com.uc.ms_security.dto.CreateUserDTO;
-import com.uc.ms_security.dto.UpdateUserDTO;
-import com.uc.ms_security.dto.UserResponseDTO;
+import com.uc.ms_security.dto.user.CreateUserDTO;
+import com.uc.ms_security.dto.user.UpdateUserDTO;
+import com.uc.ms_security.dto.user.UserResponseDTO;
 import com.uc.ms_security.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
